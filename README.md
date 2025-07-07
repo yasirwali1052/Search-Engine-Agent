@@ -1,8 +1,4 @@
-Ah! You meant you want a **short, single-section README** that includes a **brief description** **+ full working code explanation** based on the app **you built**. Here's a clear and complete version that includes **your code flow + how it works**, written simply and neatly:
 
----
-
-````markdown
 # 🔍 AI Chatbot with Web Search (LangChain + Streamlit + Groq)
 
 This is a smart chatbot built with **LangChain**, **Streamlit**, and **Groq's LLaMA 3** model. It answers your questions using three tools:  
