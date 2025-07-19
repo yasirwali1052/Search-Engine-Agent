@@ -6,7 +6,7 @@ This is a smart chatbot built with **LangChain**, **Streamlit**, and **Groq's LL
 It also shows the agent’s reasoning step-by-step using Streamlit callbacks.
 
 👉 **[Click here to open the deployed app](https://search-engine-agent-gc4gt2shfbnnudmdyoso4c.streamlit.app/)**  
-🧪 Use this free key **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** to run it:
+🧪create free api key on groqcloud and insert  to run it:
 
 ---
 
