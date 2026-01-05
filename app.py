@@ -2,8 +2,8 @@ import streamlit as st
 from langchain_groq import ChatGroq
 from langchain_community.utilities import ArxivAPIWrapper,WikipediaAPIWrapper
 from langchain_community.tools import ArxivQueryRun,WikipediaQueryRun,DuckDuckGoSearchRun
-from langchain.agents import initialize_agent,AgentType
-from langchain.callbacks import StreamlitCallbackHandler
+from langchain_classic.agents import initialize_agent, AgentExecutor, AgentType
+from langchain_community.callbacks.streamlit.streamlit_callback_handler import StreamlitCallbackHandler
 import os
 from dotenv import load_dotenv
 
@@ -31,7 +31,7 @@ api_key=st.sidebar.text_input("Enter your Groq API Key:",type="password")
 
 if "messages" not in st.session_state:
     st.session_state["messages"]=[
-        {"role":"assisstant","content":"Hi,I'm a chatbot who can search the web. How can I help you?"}
+        {"role":"assistant","content":"Hi,I'm a chatbot who can search the web. How can I help you?"}
     ]
 
 for msg in st.session_state.messages:
@@ -41,14 +41,27 @@ if prompt:=st.chat_input(placeholder="What is machine learning?"):
     st.session_state.messages.append({"role":"user","content":prompt})
     st.chat_message("user").write(prompt)
 
-    llm=ChatGroq(groq_api_key=api_key,model_name="Llama3-8b-8192",streaming=True)
+    llm=ChatGroq(groq_api_key=api_key,model_name="openai/gpt-oss-120b",streaming=True)
     tools=[search,arxiv,wiki]
-
-    search_agent=initialize_agent(tools,llm,agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,handling_parsing_errors=True)
 
     with st.chat_message("assistant"):
         st_cb=StreamlitCallbackHandler(st.container(),expand_new_thoughts=False)
-        response=search_agent.run(st.session_state.messages,callbacks=[st_cb])
-        st.session_state.messages.append({'role':'assistant',"content":response})
-        st.write(response)
-
+        # Get the last user message
+        user_message = st.session_state.messages[-1]["content"]
+        
+        try:
+            search_agent = initialize_agent(
+                tools=tools,
+                llm=llm,
+                agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+                verbose=True,
+                handle_parsing_errors=True
+            )
+            response = search_agent.run(user_message, callbacks=[st_cb])
+            final_response = response
+        except Exception as e:
+            st.error(f"Error: {str(e)}")
+            final_response = f"Sorry, I encountered an error: {str(e)}"
+        
+        st.session_state.messages.append({'role':'assistant',"content":final_response})
+        st.write(final_response)
